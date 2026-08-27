@@ -1,0 +1,38 @@
+# Rust
+/src-tauri/target/
+**/target/
+Cargo.lock.bak
+
+# Node
+node_modules/
+dist/
+dist-ssr/
+*.local
+
+# Tauri
+/src-tauri/gen/
+/src-tauri/WixTools/
+
+# Forgeyard local state (per-machine SQLite db, logs, etc.)
+.forgeyard/
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+
+# Editor / OS
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+Thumbs.db
+*.swp
+
+# Env
+.env
+.env.local
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
