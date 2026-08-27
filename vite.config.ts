@@ -4,7 +4,7 @@ import react from "@vitejs/plugin-react";
 // Tauri expects a fixed port and will fail if it is already in use.
 const devServerPort = 5173;
 
-export default defineConfig(async () => ({
+export default defineConfig({
   plugins: [react()],
   clearScreen: false,
   server: {
@@ -20,4 +20,4 @@ export default defineConfig(async () => ({
     minify: !process.env.TAURI_DEBUG ? "esbuild" : false,
     sourcemap: !!process.env.TAURI_DEBUG,
   },
-}));
+});
