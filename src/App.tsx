@@ -1,22 +1,20 @@
 import { useState } from "react";
-import "./App.css";
 
-/**
- * Root shell. Real panels (dashboard, process manager, git, etc.) are
- * wired in as their backend commands land, one module at a time.
- */
+import "./App.css";
+import { Dashboard } from "./components/Dashboard";
+import { ProjectWorkspace } from "./components/ProjectWorkspace";
+import type { ProjectRecord } from "./lib/types";
+
 export default function App() {
-  const [ready] = useState(true);
+  const [activeProject, setActiveProject] = useState<ProjectRecord | null>(null);
 
   return (
     <div className="app-shell">
-      <header className="app-shell__header">
-        <span className="app-shell__brand">Forgeyard</span>
-        <span className="app-shell__status">{ready ? "ready" : "starting…"}</span>
-      </header>
-      <main className="app-shell__main">
-        <p>Project workspace loads here once a repository is registered.</p>
-      </main>
+      {activeProject ? (
+        <ProjectWorkspace project={activeProject} onBack={() => setActiveProject(null)} />
+      ) : (
+        <Dashboard onOpenProject={setActiveProject} />
+      )}
     </div>
   );
 }
