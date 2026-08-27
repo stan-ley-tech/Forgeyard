@@ -1,3 +1,4 @@
+use crate::automation::AutomationEngine;
 use crate::db::DbPool;
 use crate::process::ProcessManager;
 
@@ -5,4 +6,5 @@ use crate::process::ProcessManager;
 pub struct AppState {
     pub db: DbPool,
     pub processes: ProcessManager,
+    pub automation: AutomationEngine,
 }

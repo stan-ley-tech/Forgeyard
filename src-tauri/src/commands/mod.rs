@@ -1,3 +1,4 @@
+mod automation_cmds;
 mod deps_cmds;
 mod git_cmds;
 mod health_cmds;
@@ -6,6 +7,7 @@ mod process_cmds;
 mod project_cmds;
 mod task_cmds;
 
+pub use automation_cmds::*;
 pub use deps_cmds::*;
 pub use git_cmds::*;
 pub use health_cmds::*;

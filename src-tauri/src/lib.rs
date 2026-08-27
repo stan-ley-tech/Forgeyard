@@ -1,3 +1,4 @@
+mod automation;
 mod commands;
 mod db;
 mod deps;
@@ -13,6 +14,7 @@ mod tasks;
 
 use tauri::Manager;
 
+use automation::AutomationEngine;
 use process::ProcessManager;
 use state::AppState;
 
@@ -25,7 +27,9 @@ pub fn run() {
             let data_dir = app.path().app_data_dir()?;
             let pool = db::init_pool(&data_dir)?;
             let processes = ProcessManager::new(app.handle().clone(), pool.clone());
-            app.manage(AppState { db: pool, processes });
+            let automation = AutomationEngine::new(app.handle().clone(), pool.clone());
+            automation.start_all()?;
+            app.manage(AppState { db: pool, processes, automation });
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
@@ -53,6 +57,12 @@ pub fn run() {
             commands::list_tasks,
             commands::run_task,
             commands::get_logs,
+            commands::list_automation_rules,
+            commands::create_automation_rule,
+            commands::delete_automation_rule,
+            commands::toggle_automation_rule,
+            commands::run_automation_rule_now,
+            commands::list_automation_runs,
         ])
         .run(tauri::generate_context!())
         .expect("error while running forgeyard");
