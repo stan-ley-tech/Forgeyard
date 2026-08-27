@@ -16,6 +16,8 @@ pub enum AppError {
     DuplicateProject(String),
     #[error("process error: {0}")]
     Process(String),
+    #[error("git error: {0}")]
+    Git(String),
     #[error("{0}")]
     Other(String),
 }

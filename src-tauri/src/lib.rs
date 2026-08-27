@@ -4,6 +4,7 @@ mod deps;
 mod detect;
 mod error;
 mod event_sink;
+mod git;
 mod process;
 mod project;
 mod state;
@@ -36,6 +37,17 @@ pub fn run() {
             commands::kill_process,
             commands::restart_process,
             commands::list_processes,
+            commands::git_status,
+            commands::git_branches,
+            commands::git_checkout,
+            commands::git_stage,
+            commands::git_unstage,
+            commands::git_commit,
+            commands::git_diff,
+            commands::git_log,
+            commands::git_stash,
+            commands::git_stash_pop,
+            commands::git_merge,
         ])
         .run(tauri::generate_context!())
         .expect("error while running forgeyard");
