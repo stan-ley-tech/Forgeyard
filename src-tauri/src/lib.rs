@@ -8,6 +8,7 @@ mod git;
 mod process;
 mod project;
 mod state;
+mod tasks;
 
 use tauri::Manager;
 
@@ -48,6 +49,8 @@ pub fn run() {
             commands::git_stash,
             commands::git_stash_pop,
             commands::git_merge,
+            commands::list_tasks,
+            commands::run_task,
         ])
         .run(tauri::generate_context!())
         .expect("error while running forgeyard");

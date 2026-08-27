@@ -18,6 +18,8 @@ pub enum AppError {
     Process(String),
     #[error("git error: {0}")]
     Git(String),
+    #[error("task error: {0}")]
+    Task(String),
     #[error("{0}")]
     Other(String),
 }
