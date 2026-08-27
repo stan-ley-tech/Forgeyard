@@ -892,6 +892,7 @@ dependencies = [
  "chrono",
  "r2d2",
  "r2d2_sqlite",
+ "regex",
  "rusqlite",
  "serde",
  "serde_json",
@@ -901,6 +902,7 @@ dependencies = [
  "tauri-plugin-fs",
  "tempfile",
  "thiserror 1.0.69",
+ "toml 0.8.2",
  "uuid",
 ]
 

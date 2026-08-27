@@ -1,5 +1,6 @@
 mod commands;
 mod db;
+mod deps;
 mod detect;
 mod error;
 mod project;
@@ -25,6 +26,7 @@ pub fn run() {
             commands::add_project,
             commands::remove_project,
             commands::get_project_health,
+            commands::list_dependencies,
         ])
         .run(tauri::generate_context!())
         .expect("error while running forgeyard");
