@@ -4,29 +4,458 @@
   height: 100vh;
 }
 
-.app-shell__header {
+/* Dashboard */
+
+.dashboard {
+  padding: 1.5rem;
+  overflow: auto;
+}
+
+.dashboard__header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.5rem 1rem;
-  border-bottom: 1px solid var(--border);
-  background: var(--surface);
+  margin-bottom: 1rem;
 }
 
-.app-shell__brand {
-  font-weight: 600;
-  letter-spacing: 0.02em;
+.dashboard__header h1 {
+  font-size: 1.25rem;
+  margin: 0;
 }
 
-.app-shell__status {
-  font-size: 0.8rem;
+.dashboard__status {
   color: var(--text-muted);
-  text-transform: uppercase;
 }
 
-.app-shell__main {
+.dashboard__error {
+  color: var(--danger);
+}
+
+.dashboard__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 0.75rem;
+}
+
+.project-card {
+  text-align: left;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1rem;
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.project-card:hover {
+  border-color: var(--accent);
+}
+
+.project-card__name {
+  font-weight: 600;
+}
+
+.project-card__path {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.project-card__badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.badge {
+  font-size: 0.7rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+}
+
+/* Workspace */
+
+.workspace {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.workspace__header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.workspace__header h1 {
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+.workspace__back {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+}
+
+.workspace__tabs {
+  display: flex;
+  gap: 0.25rem;
+  padding: 0.5rem 1rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.workspace__tab {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  padding: 0.5rem 0.75rem;
+  border-bottom: 2px solid transparent;
+}
+
+.workspace__tab--active {
+  color: var(--text);
+  border-bottom-color: var(--accent);
+}
+
+.workspace__content {
   flex: 1;
   overflow: auto;
   padding: 1rem;
+}
+
+/* Shared table styling */
+
+.process-table,
+.dependency-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.process-table th,
+.process-table td,
+.dependency-table th,
+.dependency-table td {
+  text-align: left;
+  padding: 0.4rem 0.6rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.process-table__row--selected {
+  background: var(--surface-alt);
+}
+
+.process-table__actions button {
+  margin-right: 0.35rem;
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: 4px;
+  padding: 0.2rem 0.5rem;
+}
+
+/* Status dots */
+
+.status-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 0.4rem;
+}
+
+.status-dot--running {
+  background: var(--success);
+}
+
+.status-dot--stopping {
+  background: var(--warning);
+}
+
+.status-dot--stopped {
+  background: var(--text-muted);
+}
+
+.status-dot--crashed {
+  background: var(--danger);
+}
+
+/* Process panel */
+
+.process-panel__new {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.process-panel__new input {
+  flex: 1;
+}
+
+.process-panel__error,
+.git-panel__error,
+.task-panel__error,
+.automation-panel__error {
+  color: var(--danger);
+  margin-bottom: 0.5rem;
+}
+
+.process-panel__logs {
+  margin-top: 1rem;
+}
+
+/* Terminal */
+
+.terminal {
+  background: #05060a;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.5rem;
+  max-height: 320px;
+  overflow: auto;
+  font-size: 0.8rem;
+}
+
+.terminal__empty {
+  color: var(--text-muted);
+}
+
+.terminal__line {
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.terminal__line--stderr {
+  color: var(--danger);
+}
+
+.terminal__line--info {
+  color: var(--accent);
+}
+
+/* Git panel */
+
+.git-panel__columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.git-panel__file-list,
+.git-panel__branch-list,
+.git-panel__commit-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1rem;
+  font-size: 0.85rem;
+}
+
+.git-panel__file-list li,
+.git-panel__branch-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.2rem 0;
+}
+
+.git-panel__commit-list li {
+  padding: 0.3rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.git-panel__commit-meta {
+  display: block;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+}
+
+.git-panel__branch--current {
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.git-panel__commit,
+.git-panel__stash {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.git-panel__commit input {
+  flex: 1;
+}
+
+.git-panel__diff {
+  margin-top: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.75rem;
+}
+
+.git-panel__diff-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.git-panel__diff pre {
+  max-height: 320px;
+  overflow: auto;
+  font-size: 0.8rem;
+}
+
+/* Dependency panel */
+
+.dependency-panel__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.dependency-panel__conflicts {
+  background: rgba(229, 84, 79, 0.1);
+  border: 1px solid var(--danger);
+  border-radius: 6px;
+  padding: 0.5rem 0.75rem;
+  margin-bottom: 1rem;
+  font-size: 0.85rem;
+}
+
+/* Logs panel */
+
+.logs-panel__filters {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+  align-items: center;
+}
+
+.logs-panel__list {
+  font-family: "Cascadia Code", "SFMono-Regular", Consolas, monospace;
+  font-size: 0.8rem;
+  background: #05060a;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.5rem;
+  max-height: 60vh;
+  overflow: auto;
+}
+
+.logs-panel__row {
+  display: flex;
+  gap: 0.6rem;
+  padding: 0.1rem 0;
+}
+
+.logs-panel__time {
+  color: var(--text-muted);
+}
+
+.logs-panel__service {
+  color: var(--accent);
+  min-width: 6rem;
+}
+
+.logs-panel__row--warn .logs-panel__message {
+  color: var(--warning);
+}
+
+.logs-panel__row--error .logs-panel__message {
+  color: var(--danger);
+}
+
+/* Task panel */
+
+.task-panel__group {
+  margin-bottom: 1rem;
+}
+
+.task-panel__tasks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.task-panel__task {
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: 6px;
+  padding: 0.4rem 0.75rem;
+}
+
+.task-panel__empty {
+  color: var(--text-muted);
+}
+
+/* Automation panel */
+
+.automation-panel__new {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-width: 420px;
+  margin-bottom: 1.5rem;
+}
+
+.automation-panel__task-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.85rem;
+  max-height: 160px;
+  overflow: auto;
+}
+
+.automation-panel__rule {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.6rem 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.automation-panel__rule-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.automation-panel__runs {
+  list-style: none;
+  padding: 0;
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
+}
+
+.automation-panel__stage {
+  display: inline-block;
+  margin-left: 0.4rem;
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  background: var(--surface-alt);
+}
+
+.automation-panel__stage--passed {
+  color: var(--success);
+}
+
+.automation-panel__stage--failed {
+  color: var(--danger);
+}
+
+.automation-panel__stage--skipped {
   color: var(--text-muted);
 }
