@@ -14,6 +14,8 @@ pub enum AppError {
     InvalidPath(String),
     #[error("project already registered: {0}")]
     DuplicateProject(String),
+    #[error("process error: {0}")]
+    Process(String),
     #[error("{0}")]
     Other(String),
 }
