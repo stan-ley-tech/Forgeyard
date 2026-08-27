@@ -8,8 +8,10 @@ use serde::Serialize;
 use tokio::io::{AsyncBufReadExt, BufReader};
 use tokio::process::{Child, Command};
 
+use crate::db::DbPool;
 use crate::error::{AppError, AppResult};
 use crate::event_sink::{to_json, EventSink};
+use crate::logs;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
 #[serde(rename_all = "lowercase")]
@@ -52,6 +54,7 @@ struct ServiceEntry {
 
 struct Inner {
     app: Arc<dyn EventSink>,
+    db: DbPool,
     services: Mutex<HashMap<String, ServiceEntry>>,
 }
 
@@ -68,10 +71,11 @@ pub struct ProcessManager {
 }
 
 impl ProcessManager {
-    pub fn new(app: impl EventSink + 'static) -> Self {
+    pub fn new(app: impl EventSink + 'static, db: DbPool) -> Self {
         Self {
             inner: Arc::new(Inner {
                 app: Arc::new(app),
+                db,
                 services: Mutex::new(HashMap::new()),
             }),
         }
@@ -230,9 +234,13 @@ impl ProcessManager {
         Reader: tokio::io::AsyncRead + Unpin + Send + 'static,
     {
         let app = self.inner.app.clone();
+        let db = self.inner.db.clone();
         tauri::async_runtime::spawn(async move {
             let mut lines = BufReader::new(reader).lines();
             while let Ok(Some(line)) = lines.next_line().await {
+                let level = logs::infer_level(stream, &line);
+                let _ = logs::record(&db, &project_id, &name, level, &line);
+
                 app.emit(
                     "process:log",
                     to_json(&LogEvent {
@@ -371,7 +379,13 @@ mod tests {
     }
 
     fn test_manager() -> ProcessManager {
-        ProcessManager::new(NoopSink)
+        let dir = tempfile::tempdir().unwrap();
+        // Leaked deliberately: the pool must outlive the temp dir for the
+        // lifetime of the test, which is simplest to guarantee this way in
+        // a short-lived test process.
+        let dir = Box::leak(Box::new(dir));
+        let db = crate::db::init_pool(dir.path()).unwrap();
+        ProcessManager::new(NoopSink, db)
     }
 
     #[tokio::test]

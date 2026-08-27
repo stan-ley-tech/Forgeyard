@@ -5,6 +5,7 @@ mod detect;
 mod error;
 mod event_sink;
 mod git;
+mod logs;
 mod process;
 mod project;
 mod state;
@@ -23,7 +24,7 @@ pub fn run() {
         .setup(|app| {
             let data_dir = app.path().app_data_dir()?;
             let pool = db::init_pool(&data_dir)?;
-            let processes = ProcessManager::new(app.handle().clone());
+            let processes = ProcessManager::new(app.handle().clone(), pool.clone());
             app.manage(AppState { db: pool, processes });
             Ok(())
         })
@@ -51,6 +52,7 @@ pub fn run() {
             commands::git_merge,
             commands::list_tasks,
             commands::run_task,
+            commands::get_logs,
         ])
         .run(tauri::generate_context!())
         .expect("error while running forgeyard");
