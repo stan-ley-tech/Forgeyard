@@ -1,5 +1,7 @@
+mod commands;
 mod db;
 mod error;
+mod project;
 mod state;
 
 use tauri::Manager;
@@ -17,7 +19,11 @@ pub fn run() {
             app.manage(AppState { db: pool });
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![])
+        .invoke_handler(tauri::generate_handler![
+            commands::list_projects,
+            commands::add_project,
+            commands::remove_project,
+        ])
         .run(tauri::generate_context!())
         .expect("error while running forgeyard");
 }

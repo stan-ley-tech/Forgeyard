@@ -8,6 +8,12 @@ pub enum AppError {
     Pool(#[from] r2d2::Error),
     #[error("io error: {0}")]
     Io(#[from] std::io::Error),
+    #[error("project not found: {0}")]
+    ProjectNotFound(String),
+    #[error("invalid project path: {0}")]
+    InvalidPath(String),
+    #[error("project already registered: {0}")]
+    DuplicateProject(String),
     #[error("{0}")]
     Other(String),
 }
