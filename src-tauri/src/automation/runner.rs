@@ -93,7 +93,15 @@ pub async fn run_now(
     }
 
     emit_progress(app, rule_id, &run_id, &stages, true);
-    persist_run(db, &run_id, rule_id, trigger_path, &stages, !failed, &started_at)?;
+    persist_run(
+        db,
+        &run_id,
+        rule_id,
+        trigger_path,
+        &stages,
+        !failed,
+        &started_at,
+    )?;
 
     Ok(stages)
 }
@@ -116,7 +124,9 @@ async fn execute_stage(cwd: &Path, command: &str) -> (StageStatus, Option<i32>) 
         c.args(["-c", command]);
         c
     };
-    cmd.current_dir(cwd).stdout(Stdio::null()).stderr(Stdio::null());
+    cmd.current_dir(cwd)
+        .stdout(Stdio::null())
+        .stderr(Stdio::null());
 
     match cmd.status().await {
         Ok(status) if status.success() => (StageStatus::Passed, status.code()),
@@ -125,7 +135,13 @@ async fn execute_stage(cwd: &Path, command: &str) -> (StageStatus, Option<i32>) 
     }
 }
 
-fn emit_progress(app: &dyn EventSink, rule_id: &str, run_id: &str, stages: &[StageResult], finished: bool) {
+fn emit_progress(
+    app: &dyn EventSink,
+    rule_id: &str,
+    run_id: &str,
+    stages: &[StageResult],
+    finished: bool,
+) {
     app.emit(
         "automation:run",
         to_json(&AutomationRunEvent {
@@ -240,11 +256,21 @@ tasks = [
         let db = pool();
         let rule_id = test_rule(&db);
         let project = project_with_tasks();
-        let tasks_to_run = vec![TaskRef { group: "Development".into(), name: "Pass".into() }];
+        let tasks_to_run = vec![TaskRef {
+            group: "Development".into(),
+            name: "Pass".into(),
+        }];
 
-        let stages = run_now(&NoopSink, &db, &rule_id, project.path(), &tasks_to_run, None)
-            .await
-            .unwrap();
+        let stages = run_now(
+            &NoopSink,
+            &db,
+            &rule_id,
+            project.path(),
+            &tasks_to_run,
+            None,
+        )
+        .await
+        .unwrap();
 
         assert_eq!(stages.len(), 1);
         assert_eq!(stages[0].status, StageStatus::Passed);
@@ -260,14 +286,30 @@ tasks = [
         let rule_id = test_rule(&db);
         let project = project_with_tasks();
         let tasks_to_run = vec![
-            TaskRef { group: "Development".into(), name: "Pass".into() },
-            TaskRef { group: "Development".into(), name: "Fail".into() },
-            TaskRef { group: "Development".into(), name: "ShouldSkip".into() },
+            TaskRef {
+                group: "Development".into(),
+                name: "Pass".into(),
+            },
+            TaskRef {
+                group: "Development".into(),
+                name: "Fail".into(),
+            },
+            TaskRef {
+                group: "Development".into(),
+                name: "ShouldSkip".into(),
+            },
         ];
 
-        let stages = run_now(&NoopSink, &db, &rule_id, project.path(), &tasks_to_run, None)
-            .await
-            .unwrap();
+        let stages = run_now(
+            &NoopSink,
+            &db,
+            &rule_id,
+            project.path(),
+            &tasks_to_run,
+            None,
+        )
+        .await
+        .unwrap();
 
         assert_eq!(stages[0].status, StageStatus::Passed);
         assert_eq!(stages[1].status, StageStatus::Failed);
@@ -282,11 +324,21 @@ tasks = [
         let db = pool();
         let rule_id = test_rule(&db);
         let project = project_with_tasks();
-        let tasks_to_run = vec![TaskRef { group: "Development".into(), name: "Nope".into() }];
+        let tasks_to_run = vec![TaskRef {
+            group: "Development".into(),
+            name: "Nope".into(),
+        }];
 
-        let stages = run_now(&NoopSink, &db, &rule_id, project.path(), &tasks_to_run, None)
-            .await
-            .unwrap();
+        let stages = run_now(
+            &NoopSink,
+            &db,
+            &rule_id,
+            project.path(),
+            &tasks_to_run,
+            None,
+        )
+        .await
+        .unwrap();
 
         assert_eq!(stages[0].status, StageStatus::Failed);
     }

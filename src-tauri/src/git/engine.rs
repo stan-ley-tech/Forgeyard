@@ -119,10 +119,16 @@ fn push_xy(xy: &str, path: &str, staged: &mut Vec<FileChange>, unstaged: &mut Ve
         return;
     };
     if x != '.' {
-        staged.push(FileChange { path: path.to_string(), status: x.to_string() });
+        staged.push(FileChange {
+            path: path.to_string(),
+            status: x.to_string(),
+        });
     }
     if y != '.' {
-        unstaged.push(FileChange { path: path.to_string(), status: y.to_string() });
+        unstaged.push(FileChange {
+            path: path.to_string(),
+            status: y.to_string(),
+        });
     }
 }
 
@@ -139,7 +145,11 @@ pub fn branches(repo_path: &Path) -> AppResult<Vec<BranchInfo>> {
             let name = parts.next()?.to_string();
             let is_current = parts.next() == Some("*");
             let is_remote = name.starts_with("origin/") || name.contains("/HEAD");
-            Some(BranchInfo { name, is_current, is_remote })
+            Some(BranchInfo {
+                name,
+                is_current,
+                is_remote,
+            })
         })
         .collect();
 

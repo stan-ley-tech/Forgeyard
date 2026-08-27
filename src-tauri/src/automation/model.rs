@@ -32,7 +32,8 @@ pub fn create(
 ) -> AppResult<AutomationRule> {
     let id = Uuid::new_v4().to_string();
     let created_at = Utc::now().to_rfc3339();
-    let watch_globs_json = serde_json::to_string(&watch_globs).map_err(|e| AppError::Other(e.to_string()))?;
+    let watch_globs_json =
+        serde_json::to_string(&watch_globs).map_err(|e| AppError::Other(e.to_string()))?;
     let tasks_json = serde_json::to_string(&tasks).map_err(|e| AppError::Other(e.to_string()))?;
 
     let conn = pool.get()?;
@@ -134,13 +135,23 @@ mod tests {
     }
 
     fn sample_tasks() -> Vec<TaskRef> {
-        vec![TaskRef { group: "Development".into(), name: "Test".into() }]
+        vec![TaskRef {
+            group: "Development".into(),
+            name: "Test".into(),
+        }]
     }
 
     #[test]
     fn create_and_list_round_trip() {
         let pool = pool();
-        create(&pool, "proj", "on save", vec!["*.rs".into()], sample_tasks()).unwrap();
+        create(
+            &pool,
+            "proj",
+            "on save",
+            vec!["*.rs".into()],
+            sample_tasks(),
+        )
+        .unwrap();
 
         let rules = list(&pool, "proj").unwrap();
 

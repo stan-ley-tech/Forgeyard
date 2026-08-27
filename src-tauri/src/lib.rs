@@ -29,7 +29,11 @@ pub fn run() {
             let processes = ProcessManager::new(app.handle().clone(), pool.clone());
             let automation = AutomationEngine::new(app.handle().clone(), pool.clone());
             automation.start_all()?;
-            app.manage(AppState { db: pool, processes, automation });
+            app.manage(AppState {
+                db: pool,
+                processes,
+                automation,
+            });
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![

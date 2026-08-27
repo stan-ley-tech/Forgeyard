@@ -37,7 +37,11 @@ pub fn git_stage(state: State<AppState>, project_id: String, files: Vec<String>)
 }
 
 #[tauri::command]
-pub fn git_unstage(state: State<AppState>, project_id: String, files: Vec<String>) -> AppResult<()> {
+pub fn git_unstage(
+    state: State<AppState>,
+    project_id: String,
+    files: Vec<String>,
+) -> AppResult<()> {
     git::unstage(&project_path(&state, &project_id)?, &files)
 }
 
@@ -57,7 +61,11 @@ pub fn git_diff(
 }
 
 #[tauri::command]
-pub fn git_log(state: State<AppState>, project_id: String, limit: u32) -> AppResult<Vec<CommitInfo>> {
+pub fn git_log(
+    state: State<AppState>,
+    project_id: String,
+    limit: u32,
+) -> AppResult<Vec<CommitInfo>> {
     git::log(&project_path(&state, &project_id)?, limit)
 }
 

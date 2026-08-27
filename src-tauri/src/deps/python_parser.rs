@@ -175,7 +175,9 @@ dev = ["pytest>=8.0"]
         let deps = parse_pyproject(toml).unwrap();
 
         assert_eq!(deps.len(), 3);
-        assert!(deps.iter().any(|d| d.name == "redis" && d.version_spec == "~=5.0"));
+        assert!(deps
+            .iter()
+            .any(|d| d.name == "redis" && d.version_spec == "~=5.0"));
         assert!(deps
             .iter()
             .any(|d| d.name == "pytest" && d.kind == DependencyKind::Dev));
@@ -196,7 +198,11 @@ pytest = "^8.0"
 
         assert_eq!(deps.len(), 3);
         assert!(!deps.iter().any(|d| d.name == "python"));
-        assert!(deps.iter().any(|d| d.name == "sqlalchemy" && d.version_spec == "^2.0"));
-        assert!(deps.iter().any(|d| d.name == "pytest" && d.kind == DependencyKind::Dev));
+        assert!(deps
+            .iter()
+            .any(|d| d.name == "sqlalchemy" && d.version_spec == "^2.0"));
+        assert!(deps
+            .iter()
+            .any(|d| d.name == "pytest" && d.kind == DependencyKind::Dev));
     }
 }

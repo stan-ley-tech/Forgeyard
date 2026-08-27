@@ -33,7 +33,11 @@ pub struct AutomationEngine {
 
 impl AutomationEngine {
     pub fn new(app: impl EventSink + 'static, db: DbPool) -> Self {
-        Self { app: Arc::new(app), db, active: Mutex::new(HashMap::new()) }
+        Self {
+            app: Arc::new(app),
+            db,
+            active: Mutex::new(HashMap::new()),
+        }
     }
 
     /// Starts watching every enabled rule across all registered projects.
@@ -60,46 +64,61 @@ impl AutomationEngine {
         let last_run = Arc::new(Mutex::new(Instant::now() - Duration::from_secs(3600)));
 
         let watch_project_path = project_path.clone();
-        let mut watcher = match notify::recommended_watcher(move |res: notify::Result<notify::Event>| {
-            let Ok(event) = res else { return };
-            if !(event.kind.is_create() || event.kind.is_modify() || event.kind.is_remove()) {
-                return;
-            }
-            let Some(path) = event.paths.first() else { return };
-            if !matches_any_glob(path, &watch_globs) {
-                return;
-            }
-
-            {
-                let mut last = last_run.lock().unwrap();
-                if last.elapsed() < DEBOUNCE_WINDOW {
+        let mut watcher =
+            match notify::recommended_watcher(move |res: notify::Result<notify::Event>| {
+                let Ok(event) = res else { return };
+                if !(event.kind.is_create() || event.kind.is_modify() || event.kind.is_remove()) {
                     return;
                 }
-                *last = Instant::now();
-            }
+                let Some(path) = event.paths.first() else {
+                    return;
+                };
+                if !matches_any_glob(path, &watch_globs) {
+                    return;
+                }
 
-            let app = app.clone();
-            let db = db.clone();
-            let rule_id = rule_id.clone();
-            let tasks_to_run = tasks_to_run.clone();
-            let project_path = watch_project_path.clone();
-            let trigger_path = path.display().to_string();
+                {
+                    let mut last = last_run.lock().unwrap();
+                    if last.elapsed() < DEBOUNCE_WINDOW {
+                        return;
+                    }
+                    *last = Instant::now();
+                }
 
-            tauri::async_runtime::spawn(async move {
-                let _ =
-                    runner::run_now(app.as_ref(), &db, &rule_id, &project_path, &tasks_to_run, Some(&trigger_path))
-                        .await;
-            });
-        }) {
-            Ok(w) => w,
-            Err(_) => return,
-        };
+                let app = app.clone();
+                let db = db.clone();
+                let rule_id = rule_id.clone();
+                let tasks_to_run = tasks_to_run.clone();
+                let project_path = watch_project_path.clone();
+                let trigger_path = path.display().to_string();
 
-        if watcher.watch(&project_path, RecursiveMode::Recursive).is_err() {
+                tauri::async_runtime::spawn(async move {
+                    let _ = runner::run_now(
+                        app.as_ref(),
+                        &db,
+                        &rule_id,
+                        &project_path,
+                        &tasks_to_run,
+                        Some(&trigger_path),
+                    )
+                    .await;
+                });
+            }) {
+                Ok(w) => w,
+                Err(_) => return,
+            };
+
+        if watcher
+            .watch(&project_path, RecursiveMode::Recursive)
+            .is_err()
+        {
             return;
         }
 
-        self.active.lock().unwrap().insert(rule.id.clone(), WatchHandle { _watcher: watcher });
+        self.active
+            .lock()
+            .unwrap()
+            .insert(rule.id.clone(), WatchHandle { _watcher: watcher });
     }
 
     pub fn unwatch(&self, rule_id: &str) {

@@ -93,7 +93,10 @@ impl ProcessManager {
         {
             let services = self.inner.services.lock().unwrap();
             if let Some(existing) = services.get(&key) {
-                if matches!(existing.info.status, ProcessStatus::Running | ProcessStatus::Stopping) {
+                if matches!(
+                    existing.info.status,
+                    ProcessStatus::Running | ProcessStatus::Stopping
+                ) {
                     return Err(AppError::Process(format!("{name} is already running")));
                 }
             }
@@ -167,7 +170,12 @@ impl ProcessManager {
             let services = self.inner.services.lock().unwrap();
             services
                 .get(&key)
-                .map(|e| matches!(e.info.status, ProcessStatus::Running | ProcessStatus::Stopping))
+                .map(|e| {
+                    matches!(
+                        e.info.status,
+                        ProcessStatus::Running | ProcessStatus::Stopping
+                    )
+                })
                 .unwrap_or(false)
         };
 
@@ -181,7 +189,10 @@ impl ProcessManager {
                     services
                         .get(&key)
                         .map(|e| {
-                            matches!(e.info.status, ProcessStatus::Running | ProcessStatus::Stopping)
+                            matches!(
+                                e.info.status,
+                                ProcessStatus::Running | ProcessStatus::Stopping
+                            )
                         })
                         .unwrap_or(false)
                 };
@@ -229,8 +240,13 @@ impl ProcessManager {
         terminate(pid, signal)
     }
 
-    fn spawn_log_reader<Reader>(&self, project_id: String, name: String, stream: &'static str, reader: Reader)
-    where
+    fn spawn_log_reader<Reader>(
+        &self,
+        project_id: String,
+        name: String,
+        stream: &'static str,
+        reader: Reader,
+    ) where
         Reader: tokio::io::AsyncRead + Unpin + Send + 'static,
     {
         let app = self.inner.app.clone();
@@ -441,7 +457,11 @@ mod tests {
         .await;
 
         assert!(crashed, "expected job to finish as Crashed");
-        let info = manager.list("p3").into_iter().find(|p| p.name == "job").unwrap();
+        let info = manager
+            .list("p3")
+            .into_iter()
+            .find(|p| p.name == "job")
+            .unwrap();
         assert_eq!(info.exit_code, Some(7));
     }
 
@@ -463,7 +483,10 @@ mod tests {
         })
         .await;
 
-        assert!(stopped, "an intentional kill should not be reported as a crash");
+        assert!(
+            stopped,
+            "an intentional kill should not be reported as a crash"
+        );
     }
 
     #[tokio::test]
@@ -472,7 +495,12 @@ mod tests {
         let cwd = std::env::current_dir().unwrap();
 
         manager
-            .start("p5".into(), "web".into(), long_running().into(), cwd.clone())
+            .start(
+                "p5".into(),
+                "web".into(),
+                long_running().into(),
+                cwd.clone(),
+            )
             .unwrap();
         let second = manager.start("p5".into(), "web".into(), long_running().into(), cwd);
 

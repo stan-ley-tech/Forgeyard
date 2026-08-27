@@ -20,7 +20,9 @@ pub fn detect(project_path: &Path) -> Vec<Language> {
     if project_path.join("package.json").is_file() {
         found.push(Language::Node);
     }
-    if project_path.join("requirements.txt").is_file() || project_path.join("pyproject.toml").is_file() {
+    if project_path.join("requirements.txt").is_file()
+        || project_path.join("pyproject.toml").is_file()
+    {
         found.push(Language::Python);
     }
     if project_path.join("go.mod").is_file() {
@@ -52,7 +54,11 @@ mod tests {
     #[test]
     fn detects_python_from_either_manifest() {
         let dir = tempfile::tempdir().unwrap();
-        fs::write(dir.path().join("pyproject.toml"), "[project]\nname = \"x\"\n").unwrap();
+        fs::write(
+            dir.path().join("pyproject.toml"),
+            "[project]\nname = \"x\"\n",
+        )
+        .unwrap();
 
         assert_eq!(detect(dir.path()), vec![Language::Python]);
     }

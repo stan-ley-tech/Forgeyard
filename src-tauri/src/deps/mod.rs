@@ -56,13 +56,20 @@ pub fn scan(project_path: &Path) -> DependencyReport {
     if let Some(deps) = read_and_parse(project_path, "package.json", npm_parser::parse) {
         sources.push(("package.json".to_string(), deps));
     }
-    if let Some(contents) = std::fs::read_to_string(project_path.join("requirements.txt")).ok() {
-        sources.push(("requirements.txt".to_string(), python_parser::parse_requirements(&contents)));
+    if let Ok(contents) = std::fs::read_to_string(project_path.join("requirements.txt")) {
+        sources.push((
+            "requirements.txt".to_string(),
+            python_parser::parse_requirements(&contents),
+        ));
     }
-    if let Some(deps) = read_and_parse(project_path, "pyproject.toml", python_parser::parse_pyproject) {
+    if let Some(deps) = read_and_parse(
+        project_path,
+        "pyproject.toml",
+        python_parser::parse_pyproject,
+    ) {
         sources.push(("pyproject.toml".to_string(), deps));
     }
-    if let Some(contents) = std::fs::read_to_string(project_path.join("go.mod")).ok() {
+    if let Ok(contents) = std::fs::read_to_string(project_path.join("go.mod")) {
         sources.push(("go.mod".to_string(), go_parser::parse(&contents)));
     }
     if let Some(deps) = read_and_parse(project_path, "Cargo.toml", cargo_parser::parse) {
@@ -72,7 +79,10 @@ pub fn scan(project_path: &Path) -> DependencyReport {
     let conflicts = find_conflicts(&sources);
     let dependencies = sources.into_iter().flat_map(|(_, deps)| deps).collect();
 
-    DependencyReport { dependencies, conflicts }
+    DependencyReport {
+        dependencies,
+        conflicts,
+    }
 }
 
 fn read_and_parse<T, E>(
@@ -106,7 +116,10 @@ fn find_conflicts(sources: &[(String, Vec<Dependency>)]) -> Vec<DependencyConfli
             let mut distinct: Vec<&str> = entries.iter().map(|(_, v)| v.as_str()).collect();
             distinct.sort_unstable();
             distinct.dedup();
-            (distinct.len() > 1).then_some(DependencyConflict { name, sources: entries })
+            (distinct.len() > 1).then_some(DependencyConflict {
+                name,
+                sources: entries,
+            })
         })
         .collect();
 
@@ -142,7 +155,11 @@ mod tests {
             r#"{"dependencies": {"react": "^18.0.0"}}"#,
         )
         .unwrap();
-        fs::write(dir.path().join("go.mod"), "module x\n\nrequire github.com/a/b v1.0.0\n").unwrap();
+        fs::write(
+            dir.path().join("go.mod"),
+            "module x\n\nrequire github.com/a/b v1.0.0\n",
+        )
+        .unwrap();
 
         let report = scan(dir.path());
 

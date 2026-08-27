@@ -164,6 +164,9 @@ mod tests {
         remove(&pool, &record.id).unwrap();
 
         assert!(list(&pool).unwrap().is_empty());
-        assert!(matches!(find(&pool, &record.id), Err(AppError::ProjectNotFound(_))));
+        assert!(matches!(
+            find(&pool, &record.id),
+            Err(AppError::ProjectNotFound(_))
+        ));
     }
 }

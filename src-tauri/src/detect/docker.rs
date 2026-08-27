@@ -13,10 +13,15 @@ pub struct DockerInfo {
 pub fn detect(project_path: &Path) -> DockerInfo {
     let has_dockerfile = project_path.join("Dockerfile").is_file();
 
-    let compose_path = ["docker-compose.yml", "docker-compose.yaml", "compose.yml", "compose.yaml"]
-        .iter()
-        .map(|name| project_path.join(name))
-        .find(|path| path.is_file());
+    let compose_path = [
+        "docker-compose.yml",
+        "docker-compose.yaml",
+        "compose.yml",
+        "compose.yaml",
+    ]
+    .iter()
+    .map(|name| project_path.join(name))
+    .find(|path| path.is_file());
 
     let compose_services = compose_path
         .as_ref()

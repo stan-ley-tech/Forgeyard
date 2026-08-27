@@ -34,11 +34,13 @@ pub struct LogFilter {
 /// requiring the underlying process to emit structured logs.
 pub fn infer_level(stream: &str, message: &str) -> LogLevel {
     let lower = message.to_ascii_lowercase();
-    if stream == "stderr" && ["error", "panic", "exception", "traceback"].iter().any(|m| lower.contains(m)) {
+    if stream == "stderr"
+        && ["error", "panic", "exception", "traceback"]
+            .iter()
+            .any(|m| lower.contains(m))
+    {
         LogLevel::Error
-    } else if lower.contains("warn") {
-        LogLevel::Warn
-    } else if stream == "stderr" {
+    } else if lower.contains("warn") || stream == "stderr" {
         LogLevel::Warn
     } else {
         LogLevel::Info
@@ -48,7 +50,13 @@ pub fn infer_level(stream: &str, message: &str) -> LogLevel {
 /// Appends one line to the unified log and trims the project's history to
 /// the most recent entries, so a long-running dev session doesn't grow the
 /// database without bound.
-pub fn record(pool: &DbPool, project_id: &str, service: &str, level: LogLevel, message: &str) -> AppResult<()> {
+pub fn record(
+    pool: &DbPool,
+    project_id: &str,
+    service: &str,
+    level: LogLevel,
+    message: &str,
+) -> AppResult<()> {
     const RETENTION_PER_PROJECT: i64 = 5000;
 
     let conn = pool.get()?;
@@ -82,16 +90,19 @@ pub fn query(pool: &DbPool, project_id: &str, filter: &LogFilter) -> AppResult<V
     )?;
 
     let mut rows = stmt
-        .query_map(params![project_id, filter.service, level_str, filter.search, limit], |row| {
-            Ok(LogEntry {
-                id: row.get(0)?,
-                project_id: row.get(1)?,
-                service: row.get(2)?,
-                level: str_to_level(&row.get::<_, String>(3)?),
-                message: row.get(4)?,
-                created_at: row.get(5)?,
-            })
-        })?
+        .query_map(
+            params![project_id, filter.service, level_str, filter.search, limit],
+            |row| {
+                Ok(LogEntry {
+                    id: row.get(0)?,
+                    project_id: row.get(1)?,
+                    service: row.get(2)?,
+                    level: str_to_level(&row.get::<_, String>(3)?),
+                    message: row.get(4)?,
+                    created_at: row.get(5)?,
+                })
+            },
+        )?
         .collect::<Result<Vec<_>, _>>()?;
 
     rows.reverse(); // oldest first, matching reading order in the UI
@@ -154,7 +165,10 @@ mod tests {
         let filtered = query(
             &pool,
             "proj",
-            &LogFilter { service: Some("worker".into()), ..Default::default() },
+            &LogFilter {
+                service: Some("worker".into()),
+                ..Default::default()
+            },
         )
         .unwrap();
 
@@ -164,7 +178,10 @@ mod tests {
         let errors_only = query(
             &pool,
             "proj",
-            &LogFilter { level: Some(LogLevel::Error), ..Default::default() },
+            &LogFilter {
+                level: Some(LogLevel::Error),
+                ..Default::default()
+            },
         )
         .unwrap();
         assert_eq!(errors_only.len(), 1);
@@ -179,7 +196,10 @@ mod tests {
         let matches = query(
             &pool,
             "proj",
-            &LogFilter { search: Some("500".into()), ..Default::default() },
+            &LogFilter {
+                search: Some("500".into()),
+                ..Default::default()
+            },
         )
         .unwrap();
 
@@ -189,8 +209,17 @@ mod tests {
 
     #[test]
     fn infer_level_flags_stderr_error_markers() {
-        assert_eq!(infer_level("stderr", "Unhandled exception at line 4"), LogLevel::Error);
-        assert_eq!(infer_level("stderr", "deprecation warning: foo"), LogLevel::Warn);
-        assert_eq!(infer_level("stdout", "server listening on :3000"), LogLevel::Info);
+        assert_eq!(
+            infer_level("stderr", "Unhandled exception at line 4"),
+            LogLevel::Error
+        );
+        assert_eq!(
+            infer_level("stderr", "deprecation warning: foo"),
+            LogLevel::Warn
+        );
+        assert_eq!(
+            infer_level("stdout", "server listening on :3000"),
+            LogLevel::Info
+        );
     }
 }

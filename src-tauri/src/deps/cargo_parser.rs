@@ -67,9 +67,9 @@ tempfile = "3"
         let deps = parse(toml).unwrap();
 
         assert_eq!(deps.len(), 3);
-        assert!(deps
-            .iter()
-            .any(|d| d.name == "serde" && d.version_spec == "1" && d.kind == DependencyKind::Runtime));
+        assert!(deps.iter().any(|d| d.name == "serde"
+            && d.version_spec == "1"
+            && d.kind == DependencyKind::Runtime));
         assert!(deps
             .iter()
             .any(|d| d.name == "tempfile" && d.kind == DependencyKind::Dev));

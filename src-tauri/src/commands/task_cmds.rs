@@ -32,7 +32,10 @@ pub fn run_task(
         .ok_or_else(|| AppError::Task(format!("no task named '{name}' in group '{group}'")))?;
 
     let service_name = format!("{group}:{name}");
-    state
-        .processes
-        .start(project_id, service_name, command, PathBuf::from(record.path))
+    state.processes.start(
+        project_id,
+        service_name,
+        command,
+        PathBuf::from(record.path),
+    )
 }

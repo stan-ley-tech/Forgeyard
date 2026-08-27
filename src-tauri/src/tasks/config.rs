@@ -65,7 +65,10 @@ fn derive_npm_scripts(project_path: &Path) -> Option<TaskGroup> {
     if tasks.is_empty() {
         None
     } else {
-        Some(TaskGroup { name: "Scripts".to_string(), tasks })
+        Some(TaskGroup {
+            name: "Scripts".to_string(),
+            tasks,
+        })
     }
 }
 
